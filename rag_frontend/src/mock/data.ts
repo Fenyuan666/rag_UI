@@ -28,18 +28,30 @@ export const alarmList = [
 
 export const tenants = [
   {
+    id: 'tnt-001',
     name: 'Acme Group',
+    shortName: 'Acme',
     contact: 'alice@acme.com',
     createdAt: '2023-11-12',
     status: 'active',
-    quota: '64G / 128G'
+    quota: '64G / 128G',
+    storageUsed: 64,
+    storageTotal: 128,
+    apiUsed: 5200,
+    apiTotal: 10000
   },
   {
+    id: 'tnt-002',
     name: 'Nova Tech',
+    shortName: 'Nova',
     contact: 'bob@nova.com',
     createdAt: '2024-01-05',
     status: 'disabled',
-    quota: '12G / 64G'
+    quota: '12G / 64G',
+    storageUsed: 12,
+    storageTotal: 64,
+    apiUsed: 800,
+    apiTotal: 5000
   }
 ];
 

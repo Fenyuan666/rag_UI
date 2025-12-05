@@ -3,16 +3,18 @@ import {
   Avatar,
   Button,
   Card,
-  Col,
   Input,
   Layout,
   List,
   Row,
   Space,
   Tag,
-  Typography
+  Typography,
+  Popconfirm,
+  Rate,
+  Modal
 } from 'antd';
-import { AudioOutlined, SendOutlined, SearchOutlined } from '@ant-design/icons';
+import { AudioOutlined, SendOutlined, SearchOutlined, StarOutlined, StarFilled, PlusOutlined } from '@ant-design/icons';
 import { chatHistory, kbSearchResults } from '../../mock/data';
 
 const { Sider, Content } = Layout;
@@ -30,6 +32,11 @@ const ChatPage = () => {
     { from: 'bot', content: '产品手册亮点：1) 支持多租户隔离 2) 内置分块优化 3) 提供备份恢复策略', sources: ['产品手册V2.pdf'] }
   ]);
   const [input, setInput] = useState('');
+  const [sessions, setSessions] = useState(chatHistory.map((c) => ({ ...c, starred: false })));
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedbackTarget, setFeedbackTarget] = useState<Message | null>(null);
+  const [feedbackRate, setFeedbackRate] = useState(0);
+  const [feedbackText, setFeedbackText] = useState('');
 
   const send = () => {
     if (!input) return;
@@ -37,16 +44,52 @@ const ChatPage = () => {
     setInput('');
   };
 
+  const addSession = () => {
+    const title = `未命名会话-${Date.now()}`;
+    setSessions([{ id: Date.now(), title, updatedAt: '刚刚', starred: false }, ...sessions]);
+  };
+
+  const toggleStar = (id: number) => {
+    setSessions((prev) =>
+      prev
+        .map((s) => (s.id === id ? { ...s, starred: !s.starred } : s))
+        .sort((a, b) => Number(b.starred) - Number(a.starred))
+    );
+  };
+
   return (
     <div>
       <div className="page-title">智能问答</div>
       <Layout style={{ background: 'transparent' }}>
         <Sider width={240} style={{ background: '#fff', borderRadius: 8 }}>
-          <Card title="会话列表" bordered={false} bodyStyle={{ padding: 0 }}>
+          <Card
+            title={
+              <Space>
+                我的会话
+                <Button type="primary" icon={<PlusOutlined />} size="small" onClick={addSession}>
+                  新建
+                </Button>
+              </Space>
+            }
+            bordered={false}
+            bodyStyle={{ padding: 0 }}
+            extra={<Input.Search placeholder="搜索会话" size="small" />}
+          >
             <List
-              dataSource={chatHistory}
+              dataSource={sessions}
               renderItem={(item) => (
-                <List.Item>
+                <List.Item
+                  actions={[
+                    item.starred ? (
+                      <StarFilled key="star" style={{ color: '#faad14' }} onClick={() => toggleStar(item.id)} />
+                    ) : (
+                      <StarOutlined key="star" onClick={() => toggleStar(item.id)} />
+                    ),
+                    <Popconfirm key="del" title="确认删除此会话？">
+                      <a style={{ color: '#ff4d4f' }}>删除</a>
+                    </Popconfirm>
+                  ]}
+                >
                   <List.Item.Meta title={item.title} description={item.updatedAt} />
                 </List.Item>
               )}
@@ -81,9 +124,30 @@ const ChatPage = () => {
                             {s}
                           </Tag>
                         ))}
+                        <Button size="small" type="link" onClick={() => {}}>
+                          预览文档
+                        </Button>
                       </Space>
                     )}
                   </Space>
+                  {msg.from === 'bot' && (
+                    <Space size={4} style={{ marginTop: 4 }}>
+                      <Rate count={1} value={feedbackRate > 0 ? 1 : 0} onChange={() => { setFeedbackTarget(msg); setFeedbackOpen(true); setFeedbackRate(1); }} />
+                      <Rate
+                        count={1}
+                        value={feedbackRate === -1 ? 1 : 0}
+                        character="👎"
+                        onChange={() => {
+                          setFeedbackTarget(msg);
+                          setFeedbackOpen(true);
+                          setFeedbackRate(-1);
+                        }}
+                      />
+                      <Button size="small" type="link" onClick={() => setFeedbackOpen(true)}>
+                        反馈
+                      </Button>
+                    </Space>
+                  )}
                 </Row>
               ))}
             </Space>
@@ -114,6 +178,26 @@ const ChatPage = () => {
           </Card>
         </Sider>
       </Layout>
+
+      <Modal
+        open={feedbackOpen}
+        onCancel={() => setFeedbackOpen(false)}
+        onOk={() => {
+          setFeedbackOpen(false);
+          setFeedbackText('');
+        }}
+        title="回答反馈"
+      >
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <div>评分：{feedbackRate === 1 ? '有用' : feedbackRate === -1 ? '无用' : '未选择'}</div>
+          <Input.TextArea
+            value={feedbackText}
+            onChange={(e) => setFeedbackText(e.target.value)}
+            placeholder="可选，填写原因"
+            rows={3}
+          />
+        </Space>
+      </Modal>
     </div>
   );
 };

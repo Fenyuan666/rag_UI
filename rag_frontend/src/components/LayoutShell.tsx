@@ -12,7 +12,8 @@ import {
   BarChartOutlined,
   CommentOutlined,
   CustomerServiceOutlined,
-  UserOutlined
+  UserOutlined,
+  BellOutlined
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import type { MenuProps } from 'antd';
@@ -158,11 +159,23 @@ const LayoutShell = ({ role, onRoleChange }: LayoutShellProps) => {
             justifyContent: 'space-between'
           }}
         >
-          <Space>
+          <Space size="large">
+            <Space align="center">
+              <Avatar shape="square" size={36} style={{ background: '#111827', color: '#fff' }}>
+                R
+              </Avatar>
+              <div>
+                <div style={{ fontWeight: 700 }}>RAG 知识库问答</div>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  Industrial-grade UX · 1920 适配
+                </Text>
+              </div>
+            </Space>
             <RoleBadge role={role} />
             <Tag color="geekblue">Mock 数据</Tag>
           </Space>
           <Space size="middle">
+            <Button type="text" icon={<BellOutlined />} />
             <Dropdown
               menu={{
                 items: dropdownItems,
@@ -178,7 +191,7 @@ const LayoutShell = ({ role, onRoleChange }: LayoutShellProps) => {
             </Avatar>
           </Space>
         </Header>
-        <Content style={{ margin: '16px 18px 24px' }}>
+        <Content className="content-wrapper">
           <Outlet />
         </Content>
       </Layout>

@@ -1,16 +1,50 @@
-import { Card, Col, DatePicker, Row, Select, Space, Button } from 'antd';
+import { Card, Col, DatePicker, Row, Select, Space, Button, Form, message } from 'antd';
 import MockChart from '../../components/MockChart';
 
 const TenantOps = () => {
+  const [form] = Form.useForm();
+
+  const onExport = () => {
+    message.success('已导出当前筛选结果（Mock）');
+  };
+
   return (
     <div>
       <div className="page-title">租户运营统计</div>
       <Card>
-        <Space style={{ marginBottom: 12 }} wrap>
-          <DatePicker.RangePicker />
-          <Select placeholder="知识库筛选" style={{ width: 200 }} options={[{ value: 'all', label: '全部知识库' }]} />
-          <Button type="primary">导出数据</Button>
-        </Space>
+        <Form form={form} layout="inline" style={{ marginBottom: 12 }}>
+          <Form.Item label="时间范围" name="range" initialValue={[]}>
+            <DatePicker.RangePicker />
+          </Form.Item>
+          <Form.Item label="知识库筛选" name="kb">
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="全部知识库"
+              style={{ width: 240 }}
+              options={[{ value: 'all', label: '全部知识库' }, { value: 'faq', label: '内部FAQ' }, { value: 'manual', label: '产品手册' }]}
+            />
+          </Form.Item>
+          <Form.Item label="命中状态" name="hit" initialValue="all">
+            <Select
+              style={{ width: 120 }}
+              options={[
+                { value: 'all', label: '全部' },
+                { value: 'hit', label: '命中' },
+                { value: 'miss', label: '未命中' }
+              ]}
+            />
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button type="primary">筛选</Button>
+              <Button onClick={() => form.resetFields()}>重置</Button>
+              <Button type="dashed" onClick={onExport}>
+                导出数据
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
         <Row gutter={12}>
           <Col span={12}>
             <Card title="问答量趋势（日/周/月）">
@@ -30,8 +64,8 @@ const TenantOps = () => {
             </Card>
           </Col>
           <Col span={12}>
-            <Card title="导出">
-              <MockChart title="数据导出示意" percent={30} trend="up" />
+            <Card title="未命中问题列表（Top10）">
+              <MockChart title="列表导出示意" percent={30} trend="up" />
             </Card>
           </Col>
         </Row>

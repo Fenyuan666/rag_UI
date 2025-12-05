@@ -1,4 +1,4 @@
-import { Button, Card, Modal, Space, Table, Tag } from 'antd';
+import { Button, Card, Modal, Space, Table, Tag, Typography } from 'antd';
 import { useState } from 'react';
 import { qaLogs } from '../../mock/data';
 
@@ -16,8 +16,14 @@ const TenantQALog = () => {
       render: (v: boolean) => <Tag color={v ? 'green' : 'red'}>{v ? '命中' : '未命中'}</Tag>
     },
     {
+      title: '用户反馈',
+      render: (_: unknown, record: (typeof qaLogs)[number]) => (
+        <Tag color={record.id % 2 === 0 ? 'blue' : 'gold'}>{record.id % 2 === 0 ? '满意' : '待反馈'}</Tag>
+      )
+    },
+    {
       title: '操作',
-      render: (_, record: (typeof qaLogs)[number]) => <a onClick={() => setCurrent(record)}>详情</a>
+      render: (_: unknown, record: (typeof qaLogs)[number]) => <a onClick={() => setCurrent(record)}>详情</a>
     }
   ];
 
@@ -33,13 +39,14 @@ const TenantQALog = () => {
 
       <Modal open={!!current} onCancel={() => setCurrent(null)} footer={null} title="回答详情" width={640}>
         {current && (
-          <div>
-            <p>用户：{current.user}</p>
-            <p>问题：{current.question}</p>
-            <p>回答：{current.answer}</p>
-            <p>溯源文档：mock-doc-1、mock-doc-2</p>
-            <p>用户反馈：满意</p>
-          </div>
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Typography.Text>用户：{current.user}</Typography.Text>
+            <Typography.Text>问题：{current.question}</Typography.Text>
+            <Typography.Text>回答：{current.answer}</Typography.Text>
+            <Typography.Text>溯源文档：mock-doc-1、mock-doc-2</Typography.Text>
+            <Typography.Text>命中状态：{current.hit ? '命中' : '未命中'}</Typography.Text>
+            <Typography.Text>用户反馈：{current.id % 2 === 0 ? '有用，已采纳' : '无反馈'}</Typography.Text>
+          </Space>
         )}
       </Modal>
     </div>
